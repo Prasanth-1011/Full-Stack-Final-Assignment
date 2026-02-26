@@ -12,6 +12,11 @@ const cartSchema = new Schema(
             type: Array,
             default: [],
         },
+
+        buyLater: {
+            type: Array,
+            default: [],
+        },
     },
     { timestamps: true },
 );
