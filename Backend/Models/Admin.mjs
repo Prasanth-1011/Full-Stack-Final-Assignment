@@ -23,6 +23,11 @@ const adminSchema = new Schema(
             max: 20,
         },
 
+        role: {
+            type: String,
+            default: "Admin",
+        },
+
         status: {
             type: String,
             required: true,
