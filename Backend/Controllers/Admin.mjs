@@ -77,3 +77,88 @@ export const loginAdmin = async (req, res) => {
         });
     }
 };
+
+// Get All Pending Admins (Root Only)
+export const getPendingAdmins = async (req, res) => {
+    try {
+        const rootAdmin = await Admin.findById(req.body.rootId);
+
+        if (!rootAdmin || rootAdmin.status !== "Root") {
+            return res
+                .status(403)
+                .json({ message: "Access Denied: Root Admin Only" });
+        }
+
+        const pendingAdmins = await Admin.find({ status: "Pending" }).select(
+            "-password",
+        );
+        res.status(200).json({
+            pendingAdmins,
+            message: "Fetched pending admins",
+        });
+    } catch (error) {
+        res.status(500).json({ message: "Server Error", error: error.message });
+    }
+};
+
+// Approve Admin Form Pending to Active (Root Only)
+export const approveAdmin = async (req, res) => {
+    try {
+        const { rootId, adminIdToApprove } = req.body;
+
+        const rootAdmin = await Admin.findById(rootId);
+        if (!rootAdmin || rootAdmin.status !== "Root") {
+            return res
+                .status(403)
+                .json({ message: "Access Denied: Root Admin Only" });
+        }
+
+        const updatedAdmin = await Admin.findByIdAndUpdate(
+            adminIdToApprove,
+            { status: "Active" },
+            { new: true },
+        ).select("-password");
+
+        if (!updatedAdmin) {
+            return res.status(404).json({ message: "Admin not found" });
+        }
+
+        res.status(200).json({
+            admin: updatedAdmin,
+            message: "Admin approved successfully",
+        });
+    } catch (error) {
+        res.status(500).json({ message: "Server Error", error: error.message });
+    }
+};
+
+// Reject Admin Form Pending to Inactive (Root Only)
+export const rejectAdmin = async (req, res) => {
+    try {
+        const { rootId, adminIdToReject } = req.body;
+
+        const rootAdmin = await Admin.findById(rootId);
+        if (!rootAdmin || rootAdmin.status !== "Root") {
+            return res
+                .status(403)
+                .json({ message: "Access Denied: Root Admin Only" });
+        }
+
+        const updatedAdmin = await Admin.findByIdAndUpdate(
+            adminIdToReject,
+            { status: "Inactive" },
+            { new: true },
+        ).select("-password");
+
+        if (!updatedAdmin) {
+            return res.status(404).json({ message: "Admin not found" });
+        }
+
+        res.status(200).json({
+            admin: updatedAdmin,
+            message: "Admin rejected successfully",
+        });
+    } catch (error) {
+        res.status(500).json({ message: "Server Error", error: error.message });
+    }
+};

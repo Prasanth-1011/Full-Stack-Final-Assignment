@@ -8,10 +8,20 @@ const cartSchema = new Schema(
             unique: true,
         },
 
-        products: {
-            type: Array,
-            default: [],
-        },
+        products: [
+            {
+                productId: {
+                    type: Schema.Types.ObjectId,
+                    ref: "Product",
+                    required: true,
+                },
+                quantity: {
+                    type: Number,
+                    default: 1,
+                    min: 1,
+                },
+            },
+        ],
     },
     { timestamps: true },
 );

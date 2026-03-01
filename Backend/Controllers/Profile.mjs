@@ -1,5 +1,8 @@
 import Profile from "../Models/Profile.mjs";
+import User from "../Models/User.mjs";
+import Admin from "../Models/Admin.mjs";
 import cloudinary from "../Configs/Cloudinary.mjs";
+import bcrypt from "bcrypt";
 
 // Create Profile
 export const createProfile = async (req, res) => {
@@ -62,7 +65,7 @@ export const getProfile = async (req, res) => {
     }
 };
 
-// Update Profile
+// Update Profile Info (Additional Info)
 export const updateProfile = async (req, res) => {
     try {
         const { userId, ...data } = req.body;
@@ -116,6 +119,52 @@ export const deleteProfile = async (req, res) => {
         }
 
         res.status(200).json({ message: "Profile Deleted Successfully" });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// Update User Account (Credential fields)
+export const updateUser = async (req, res) => {
+    try {
+        const { id, username, mail, password } = req.body;
+        const updateData = {};
+
+        if (username) updateData.username = username;
+        if (mail) updateData.mail = mail;
+        if (password) updateData.password = await bcrypt.hash(password, 10);
+
+        const user = await User.findByIdAndUpdate(
+            id,
+            { $set: updateData },
+            { new: true },
+        );
+        if (!user) return res.status(404).json({ message: "User not found" });
+
+        res.status(200).json({ message: "User updated successfully", user });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// Update Admin Account (Credential fields)
+export const updateAdmin = async (req, res) => {
+    try {
+        const { id, username, mail, password } = req.body;
+        const updateData = {};
+
+        if (username) updateData.username = username;
+        if (mail) updateData.mail = mail;
+        if (password) updateData.password = await bcrypt.hash(password, 10);
+
+        const admin = await Admin.findByIdAndUpdate(
+            id,
+            { $set: updateData },
+            { new: true },
+        );
+        if (!admin) return res.status(404).json({ message: "Admin not found" });
+
+        res.status(200).json({ message: "Admin updated successfully", admin });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

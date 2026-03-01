@@ -4,14 +4,17 @@ import {
     getOrders,
     createOrder,
     updateOrder,
+    cancelOrder,
 } from "../Controllers/Order.mjs";
 
 const router = express.Router();
 
-router.get("/all", getAllOrders);
-router.get("/user", getOrders);
+router.post("/all", getAllOrders);
+router.post("/user", getOrders);
 
 router.post("/create", createOrder);
+
+router.post("/cancel", cancelOrder);
 
 router.put("/update", updateOrder);
 

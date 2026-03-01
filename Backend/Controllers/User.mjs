@@ -32,7 +32,14 @@ export const registerUser = async (req, res) => {
             message: `${username} Registered Successfully`,
         });
     } catch (error) {
-        res.status(500).json({ message: "Server Error", error: error.message });
+        res.status(500).json({
+            message: "Registration Failed",
+            error:
+                error.name === "MongooseError" ||
+                error.name === "MongoNetworkError"
+                    ? "Database connection issue"
+                    : error.message,
+        });
     }
 };
 
@@ -46,11 +53,9 @@ export const loginUser = async (req, res) => {
         if (!user) return res.status(404).json({ message: "User Not Found" });
 
         if (user.status !== "Active") {
-            return res
-                .status(403)
-                .json({
-                    message: "Account Inactive. Contact Admin For Activation",
-                });
+            return res.status(403).json({
+                message: "Account Inactive. Contact Admin For Activation",
+            });
         }
 
         const checkPassword = await user.comparePassword(password);

@@ -5,13 +5,39 @@ import Product from "../Models/Products.mjs";
 export const getCart = async (req, res) => {
     try {
         const { userId } = req.body;
-        const cart = await Cart.findOne({ userId });
+        if (!userId) {
+            return res.status(400).json({ message: "User ID is required" });
+        }
+
+        // Use lean() for faster read and to handle potentially mismatched data before population
+        let cart = await Cart.findOne({ userId });
 
         if (!cart)
-            return res.status(404).json({ cart: [], message: "Cart Empty!" });
+            return res
+                .status(404)
+                .json({ cart: { products: [] }, message: "Cart Empty!" });
+
+        // Attempt population manually to catch specific casting errors with legacy string IDs
+        try {
+            await cart.populate({
+                path: "products.productId",
+                model: "Product",
+            });
+        } catch (populateError) {
+            console.error(
+                "Cart Population Error (Data Mismatch):",
+                populateError,
+            );
+            return res.status(500).json({
+                message:
+                    "Cart data format mismatch. Please clear your cart to reset.",
+                error: populateError.message,
+            });
+        }
 
         res.status(200).json({ cart, message: "Cart Items Fetched" });
     } catch (error) {
+        console.error("GetCart Global Error:", error);
         res.status(500).json({ message: "Server Error", error: error.message });
     }
 };
@@ -28,7 +54,7 @@ export const updateCart = async (req, res) => {
 
         const product = await Product.findById(productId);
         const productIndex = cart.products.findIndex(
-            (p) => p.productId === productId,
+            (p) => p.productId && p.productId.toString() === productId,
         );
 
         if (productIndex > -1) {
@@ -66,7 +92,7 @@ export const deleteCart = async (req, res) => {
         if (!cart) return res.json({ message: "Products Not Added Yet!" });
 
         const productIndex = cart.products.findIndex(
-            (p) => p.productId === productId,
+            (p) => p.productId && p.productId.toString() === productId,
         );
 
         if (cart.products[productIndex].quantity > 1) {
