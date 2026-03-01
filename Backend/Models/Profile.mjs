@@ -15,6 +15,17 @@ const profileSchema = new Schema(
             max: 20,
         },
 
+        mail: {
+            type: String,
+            required: true,
+            unique: true,
+        },
+
+        image: {
+            type: String,
+            required: true,
+        },
+
         phone: {
             type: Number,
             required: true,

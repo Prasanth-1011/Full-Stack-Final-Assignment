@@ -5,10 +5,9 @@ const orderSchema = new Schema(
         userId: {
             type: String,
             required: true,
-            unique: true,
         },
 
-        orderId: {
+        orderNumber: {
             type: Number,
             required: true,
             unique: true,
@@ -27,8 +26,25 @@ const orderSchema = new Schema(
         status: {
             type: String,
             required: true,
-            enum: ["Pending", "Completed", "Cancelled"],
-            default: "Pending",
+            enum: ["Received", "Dispatched", "Delivered", "Cancelled"],
+            default: "Received",
+        },
+
+        receivedAt: {
+            type: Date,
+            default: Date.now,
+        },
+
+        dispatchedAt: {
+            type: Date,
+        },
+
+        deliveredAt: {
+            type: Date,
+        },
+
+        cancelledAt: {
+            type: Date,
         },
     },
 

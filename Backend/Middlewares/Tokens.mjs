@@ -1,18 +1,17 @@
-import crypto from "crypto";
 import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
 
-export const createSecretToken = (length = 32) =>
-    crypto.randomBytes(length).toString("hex");
+dotenv.config();
 
-const secretToken = createSecretToken();
-const refreshToken = createSecretToken();
+const secretToken = process.env.ACCESS_TOKEN_SECRET;
+const refreshToken = process.env.REFRESH_TOKEN_SECRET;
 
-export const createAccessToken = (user) => {
-    return jwt.sign({ user }, secretToken, { expiresIn: "15m" });
+export const createAccessToken = (id, role) => {
+    return jwt.sign({ id, role }, secretToken, { expiresIn: "15m" });
 };
 
-export const createRefreshToken = (user) => {
-    return jwt.sign({ user }, refreshToken, { expiresIn: "7d" });
+export const createRefreshToken = (id, role) => {
+    return jwt.sign({ id, role }, refreshToken, { expiresIn: "7d" });
 };
 
 export const verifyToken = (token) => {

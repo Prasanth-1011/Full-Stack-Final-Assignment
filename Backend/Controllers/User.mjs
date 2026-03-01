@@ -1,4 +1,8 @@
 import User from "../Models/User.mjs";
+import {
+    createAccessToken,
+    createRefreshToken,
+} from "../Middlewares/Tokens.mjs";
 
 export const registerUser = async (req, res) => {
     try {
@@ -19,13 +23,12 @@ export const registerUser = async (req, res) => {
             return res.status(400).json({ message: "Mail Already Exists!" });
 
         // New User
-        const user = await User.create({
+        await User.create({
             username,
             mail,
             password,
         });
         res.status(201).json({
-            user: { id: user._id, username: user.username, mail: user.mail },
             message: `${username} Registered Successfully`,
         });
     } catch (error) {
@@ -42,17 +45,31 @@ export const loginUser = async (req, res) => {
 
         if (!user) return res.status(404).json({ message: "User Not Found" });
 
+        if (user.status !== "Active") {
+            return res
+                .status(403)
+                .json({
+                    message: "Account Inactive. Contact Admin For Activation",
+                });
+        }
+
         const checkPassword = await user.comparePassword(password);
         if (!checkPassword)
             return res.status(400).json({ message: "Invalid Credential!" });
 
+        const accessToken = createAccessToken(user._id, "User");
+        const refreshToken = createRefreshToken(user._id, "User");
+
         return res.status(200).json({
             user: { id: user._id, username: user.username, mail: user.mail },
+            accessToken,
+            refreshToken,
             message: "Login Successful!",
         });
     } catch (error) {
         return res.status(500).json({
             message: "Internal Server Error",
+            error: error.message,
         });
     }
 };

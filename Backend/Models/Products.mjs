@@ -19,7 +19,7 @@ const productSchema = new Schema(
             default: false,
         },
 
-        offerPrice: {
+        offerPercentage: {
             type: Number,
             default: 0,
         },
@@ -35,6 +35,11 @@ const productSchema = new Schema(
             type: String,
             required: true,
             unique: true,
+        },
+
+        imageId: {
+            type: String,
+            required: true,
         },
 
         stock: {

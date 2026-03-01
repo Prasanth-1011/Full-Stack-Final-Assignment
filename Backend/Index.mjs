@@ -5,6 +5,9 @@ import express from "express";
 import connect from "./Database.mjs";
 import userRoutes from "./Routes/User.mjs";
 import adminRoutes from "./Routes/Admin.mjs";
+import orderRoutes from "./Routes/Order.mjs";
+import productsRoutes from "./Routes/Products.mjs";
+import profileRoutes from "./Routes/Profile.mjs";
 
 dotenv.config();
 
@@ -21,6 +24,9 @@ app.use(express.json());
 // Routes
 app.use("/api/user", userRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/order", orderRoutes);
+app.use("/api/profile", profileRoutes);
+app.use("/api/products", productsRoutes);
 
 app.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`);

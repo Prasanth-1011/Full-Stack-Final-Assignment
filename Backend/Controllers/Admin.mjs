@@ -1,4 +1,8 @@
 import Admin from "../Models/Admin.mjs";
+import {
+    createAccessToken,
+    createRefreshToken,
+} from "../Middlewares/Tokens.mjs";
 
 export const registerAdmin = async (req, res) => {
     try {
@@ -19,17 +23,12 @@ export const registerAdmin = async (req, res) => {
             return res.status(400).json({ message: "Mail Already Exists!" });
 
         // New User
-        const admin = await Admin.create({
+        await Admin.create({
             username,
             mail,
             password,
         });
         res.status(201).json({
-            admin: {
-                id: admin._id,
-                username: admin.username,
-                mail: admin.mail,
-            },
             message: `${username} Registered Successfully`,
         });
     } catch (error) {
@@ -48,19 +47,33 @@ export const loginAdmin = async (req, res) => {
 
         const checkPassword = await admin.comparePassword(password);
         if (!checkPassword)
-            return res.status(400).json({ message: "Invalid Credential!" });
+            return res.status(400).json({ message: "Invalid Credentials!" });
+
+        if (admin.status !== "Active" && admin.status !== "Root") {
+            return res
+                .status(403)
+                .json({ message: "Account Pending Activation" });
+        }
+
+        const accessToken = createAccessToken(admin._id, "Admin");
+        const refreshToken = createRefreshToken(admin._id, "Admin");
 
         return res.status(200).json({
             admin: {
                 id: admin._id,
                 username: admin.username,
                 mail: admin.mail,
+                role: admin.role,
+                status: admin.status,
             },
+            accessToken,
+            refreshToken,
             message: "Login Successful!",
         });
     } catch (error) {
         return res.status(500).json({
             message: "Internal Server Error",
+            error: error.message,
         });
     }
 };

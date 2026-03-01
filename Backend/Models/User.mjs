@@ -1,3 +1,4 @@
+import bcrypt from "bcrypt";
 import mongoose, { Schema } from "mongoose";
 
 const userSchema = new Schema(
@@ -22,17 +23,24 @@ const userSchema = new Schema(
             min: 6,
             max: 20,
         },
+
+        status: {
+            type: String,
+            enum: ["Active", "Inactive"],
+            default: "Active",
+        },
     },
     { timestamps: true },
 );
 
-userSchema.pre("save", async () => {
-    if (!this.isModified("password")) return;
+userSchema.pre("save", async function (next) {
+    if (!this.isModified("password")) return next();
     this.password = await bcrypt.hash(this.password, 10);
+    next();
 });
 
-userSchema.methods.comparePassword = async () => {
-    return await bcrypt.compare(this.password, this.password);
+userSchema.methods.comparePassword = async function (password) {
+    return await bcrypt.compare(password, this.password);
 };
 
 const User = mongoose.model("User", userSchema);
