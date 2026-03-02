@@ -1,8 +1,7 @@
-import dotenv from "dotenv";
-dotenv.config();
-
 import cors from "cors";
+import dotenv from "dotenv";
 import express from "express";
+import dns from "node:dns/promises";
 
 import connect from "./Database.mjs";
 import userRoutes from "./Routes/User.mjs";
@@ -12,6 +11,9 @@ import productsRoutes from "./Routes/Products.mjs";
 import profileRoutes from "./Routes/Profile.mjs";
 import cartRoutes from "./Routes/Cart.mjs";
 import initRootAdmin from "./Utils/initRootAdmin.mjs";
+
+dotenv.config();
+dns.setServers(["1.1.1.1", "8.8.8.8"]);
 
 const app = express();
 const port = process.env.PORT;
