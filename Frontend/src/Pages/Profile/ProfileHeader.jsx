@@ -1,14 +1,12 @@
 import { useState } from "react";
 
 import api from "../../Utils/Service";
-import defaultAvatar from "../../assets/Image-Avatar.jpg";
+import defaultAvatar from "../../Assets/Image-Avatar.jpg";
 
 const ProfileHeader = ({ user, role, profile, fetchProfile, showMsg }) => {
     const [loading, setLoading] = useState(false);
     const [imageFile, setImageFile] = useState(null);
-    const [imagePreview, setImagePreview] = useState(
-        profile?.image || defaultAvatar,
-    );
+    const [imagePreview, setImagePreview] = useState(profile?.image || defaultAvatar);
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
@@ -33,10 +31,7 @@ const ProfileHeader = ({ user, role, profile, fetchProfile, showMsg }) => {
             setImageFile(null);
             fetchProfile();
         } catch (err) {
-            showMsg(
-                err.response?.data?.message || "Image Update Failed",
-                "error",
-            );
+            showMsg(err.response?.data?.message || "Image Update Failed", "error");
         } finally {
             setLoading(false);
         }
@@ -47,11 +42,7 @@ const ProfileHeader = ({ user, role, profile, fetchProfile, showMsg }) => {
             <div className="flex flex-col items-center gap-8 md:flex-row md:items-center">
                 {/* Profile Image */}
                 <div className="group relative h-40 w-40 shrink-0 overflow-hidden rounded-full border-4 border-slate-50 shadow-inner">
-                    <img
-                        src={imagePreview}
-                        alt="Avatar"
-                        className="h-full w-full object-cover"
-                    />
+                    <img src={imagePreview} alt="Avatar" className="h-full w-full object-cover" />
 
                     <label className="absolute inset-0 flex cursor-pointer items-center justify-center bg-black/40 text-xs font-bold text-white opacity-0 transition-opacity group-hover:opacity-100">
                         <input
@@ -115,10 +106,7 @@ const ProfileHeader = ({ user, role, profile, fetchProfile, showMsg }) => {
                                         d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
                                         strokeWidth={2}
                                     />
-                                    <path
-                                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                                        strokeWidth={2}
-                                    />
+                                    <path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" strokeWidth={2} />
                                 </svg>
                                 {profile.location}
                             </div>

@@ -1,8 +1,8 @@
-import cors from "cors";
 import dotenv from "dotenv";
-import express from "express";
-
 dotenv.config();
+
+import cors from "cors";
+import express from "express";
 
 import connect from "./Database.mjs";
 import userRoutes from "./Routes/User.mjs";
