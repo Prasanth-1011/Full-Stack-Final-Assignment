@@ -5,7 +5,7 @@ import api from "../../Utils/Service";
 import { useAuth } from "../../Context/AuthContext";
 
 const AdminApproval = () => {
-    const { user, role } = useAuth();
+    const { user, role, loading: authLoading } = useAuth();
     const [pendingAdmins, setPendingAdmins] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
@@ -25,13 +25,16 @@ const AdminApproval = () => {
     };
 
     useEffect(() => {
+        if (authLoading) return;
+
         if (role === "Admin" && user?.status === "Root") {
+            setError("");
             fetchPendingAdmins();
         } else {
-            setError("Access Denied. Root Admin only.");
+            setError("Access Denied. Root Admin Only");
             setLoading(false);
         }
-    }, [role, user]);
+    }, [role, user, authLoading]);
 
     const handleApprove = async (adminId) => {
         setError("");
@@ -96,13 +99,13 @@ const AdminApproval = () => {
                         {pendingAdmins.map((admin) => (
                             <div
                                 key={admin._id}
-                                className="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50 p-4"
+                                className="flex flex-col items-center justify-between gap-2 rounded-xl border border-slate-100 bg-slate-50 p-4 md:flex-row"
                             >
                                 <div>
                                     <h3 className="font-semibold text-slate-800 capitalize">
                                         {admin.username}
                                     </h3>
-                                    <p className="text-sm text-slate-500">{admin.mail}</p>
+                                    <p className="text-slate-500">{admin.mail}</p>
                                 </div>
                                 <div className="flex space-x-2">
                                     <button
@@ -113,7 +116,7 @@ const AdminApproval = () => {
                                     </button>
                                     <button
                                         onClick={() => handleReject(admin._id)}
-                                        className="rounded-full bg-red-500 px-4 py-2 font-medium text-white shadow-md shadow-red-100 transition-all hover:bg-red-600"
+                                        className="rounded-lg bg-red-500 px-4 py-2 font-medium text-white shadow-md shadow-red-100 transition-all hover:bg-red-600"
                                     >
                                         Reject
                                     </button>
