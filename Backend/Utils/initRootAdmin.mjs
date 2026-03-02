@@ -5,9 +5,9 @@ const initRootAdmin = async () => {
         const rootExists = await Admin.findOne({ status: "Root" });
         if (!rootExists) {
             const rootAdmin = new Admin({
-                username: "Root",
-                mail: "root@admin.com",
-                password: "121212",
+                username: process.env.ROOT_USERNAME,
+                mail: process.env.ROOT_MAIL,
+                password: process.env.ROOT_PASSWORD,
                 role: "Admin",
                 status: "Root",
             });

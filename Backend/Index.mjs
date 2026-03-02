@@ -1,7 +1,5 @@
+import "dotenv/config";
 import cors from "cors";
-import dotenv from "dotenv";
-dotenv.config();
-
 import express from "express";
 
 import connect from "./Database.mjs";
@@ -34,10 +32,10 @@ const startServer = async () => {
         await connect();
         await initRootAdmin();
         app.listen(port || 3000, () => {
-            console.log(`Server running on http://localhost:${port || 3000}`);
+            console.log(`Server Running On http://localhost:${port || 3000}`);
         });
     } catch (error) {
-        console.error("Failed to start server:", error.message);
+        console.error("Failed To Start Server:", error.message);
     }
 };
 
