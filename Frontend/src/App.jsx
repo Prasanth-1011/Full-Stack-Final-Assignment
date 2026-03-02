@@ -1,16 +1,27 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
-import "./App.css";
 import Auth from "./Pages/Auth/Auth";
 import Home from "./Pages/Auth/Home";
 import Login from "./Pages/Auth/Login";
 import Register from "./Pages/Auth/Register";
 
-import Things from "./Pages/Product/Things";
-import Product from "./Pages/Product/Product";
+import Search from "./Pages/Search/Search";
 
-import Unit from "./Components/Unit";
-import Category from "./Components/Category";
+import Dashboard from "./Pages/Dashboard/Dashboard";
+import AdminOrders from "./Pages/Dashboard/AdminOrders";
+import AdminApproval from "./Pages/Dashboard/AdminApproval";
+import AdminProducts from "./Pages/Dashboard/AdminProducts";
+
+import Product from "./Pages/Product/Product";
+import ProductDetail from "./Pages/Product/ProductDetail";
+
+import UpdateProfile from "./Pages/Profile/UpdateProfile";
+
+import Cart from "./Pages/Cart/Cart";
+
+import Orders from "./Pages/Order/Orders";
+
+import { AuthProvider } from "./Context/AuthContext";
 
 const router = createBrowserRouter([
     {
@@ -29,30 +40,56 @@ const router = createBrowserRouter([
                 path: "register",
                 element: <Register />,
             },
-        ],
-    },
-    {
-        path: "/product",
-        element: <Product />,
-        children: [
             {
-                index: true,
-                element: <Things />,
+                path: "search",
+                element: <Search />,
             },
             {
-                path: ":unit",
-                element: <Unit />,
+                path: "dashboard",
+                element: <Dashboard />,
             },
             {
-                path: "category/:category",
-                element: <Category />,
+                path: "profile",
+                element: <UpdateProfile />,
+            },
+            {
+                path: "product",
+                element: <Product />,
+            },
+            {
+                path: "admin-approval",
+                element: <AdminApproval />,
+            },
+            {
+                path: "admin-orders",
+                element: <AdminOrders />,
+            },
+            {
+                path: "admin-products",
+                element: <AdminProducts />,
+            },
+            {
+                path: "product/:name",
+                element: <ProductDetail />,
+            },
+            {
+                path: "cart",
+                element: <Cart />,
+            },
+            {
+                path: "orders",
+                element: <Orders />,
             },
         ],
     },
 ]);
 
 function App() {
-    return <RouterProvider router={router} />;
+    return (
+        <AuthProvider>
+            <RouterProvider router={router} />
+        </AuthProvider>
+    );
 }
 
 export default App;

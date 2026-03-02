@@ -23,7 +23,6 @@ const profileSchema = new Schema(
 
         image: {
             type: String,
-            required: true,
         },
 
         phone: {

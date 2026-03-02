@@ -1,42 +1,33 @@
-import Profile from "../Models/Profile.mjs";
+import bcrypt from "bcrypt";
+
 import User from "../Models/User.mjs";
 import Admin from "../Models/Admin.mjs";
+import Profile from "../Models/Profile.mjs";
 import cloudinary from "../Configs/Cloudinary.mjs";
-import bcrypt from "bcrypt";
 
 // Create Profile
 export const createProfile = async (req, res) => {
     try {
-        const { userId, name, mail, phone, address, location } = req.body;
+        const { userId, phone, address, location } = req.body;
 
-        if (!req.file) {
-            return res.status(400).json({ message: "Profile Image Required" });
-        }
-
-        if (!userId || !name || !mail || !phone || !address || !location) {
+        if (!userId || !phone || !address || !location) {
             return res.status(400).json({ message: "All Fields Are Required" });
         }
 
-        // Cloudinary
-        const result = await new Promise((resolve, reject) => {
-            const stream = cloudinary.uploader.upload_stream(
-                { folder: "profiles" },
-                (error, result) => {
-                    if (error) reject(error);
-                    else resolve(result);
-                },
-            );
-            stream.end(req.file.buffer);
-        });
+        // Get Name And Mail
+        let account =
+            (await User.findById(userId)) || (await Admin.findById(userId));
+        if (!account) {
+            return res.status(404).json({ message: "Account Not Found" });
+        }
 
         const profile = new Profile({
             userId,
-            name,
-            mail,
+            name: account.username,
+            mail: account.mail,
             phone,
             address,
             location,
-            image: result.secure_url,
         });
 
         await profile.save();
@@ -53,10 +44,14 @@ export const createProfile = async (req, res) => {
 export const getProfile = async (req, res) => {
     try {
         const { userId } = req.body;
+        if (!userId) {
+            return res.status(400).json({ message: "User ID Required" });
+        }
+
         const profile = await Profile.findOne({ userId });
 
         if (!profile) {
-            return res.status(404).json({ message: "Profile Not Found" });
+            return res.status(200).json(null);
         }
 
         res.status(200).json(profile);
@@ -65,13 +60,13 @@ export const getProfile = async (req, res) => {
     }
 };
 
-// Update Profile Info (Additional Info)
+// Update Profile Info
 export const updateProfile = async (req, res) => {
     try {
         const { userId, ...data } = req.body;
 
         if (!userId) {
-            return res.status(400).json({ message: "User ID Required" });
+            return res.status(400).json({ message: "User Details Required" });
         }
 
         let imageData = {};
@@ -124,7 +119,7 @@ export const deleteProfile = async (req, res) => {
     }
 };
 
-// Update User Account (Credential fields)
+// Update User Account
 export const updateUser = async (req, res) => {
     try {
         const { id, username, mail, password } = req.body;
@@ -147,7 +142,7 @@ export const updateUser = async (req, res) => {
     }
 };
 
-// Update Admin Account (Credential fields)
+// Update Admin Account
 export const updateAdmin = async (req, res) => {
     try {
         const { id, username, mail, password } = req.body;
@@ -165,6 +160,49 @@ export const updateAdmin = async (req, res) => {
         if (!admin) return res.status(404).json({ message: "Admin not found" });
 
         res.status(200).json({ message: "Admin updated successfully", admin });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// Update Profile Image
+export const updateProfileImage = async (req, res) => {
+    try {
+        const { userId } = req.body;
+
+        if (!req.file) {
+            return res.status(400).json({ message: "Profile Image Required" });
+        }
+
+        if (!userId) {
+            return res.status(400).json({ message: "User ID Required" });
+        }
+
+        const result = await new Promise((resolve, reject) => {
+            const stream = cloudinary.uploader.upload_stream(
+                { folder: "profiles" },
+                (error, result) => {
+                    if (error) reject(error);
+                    else resolve(result);
+                },
+            );
+            stream.end(req.file.buffer);
+        });
+
+        const updatedProfile = await Profile.findOneAndUpdate(
+            { userId },
+            { $set: { image: result.secure_url } },
+            { new: true },
+        );
+
+        if (!updatedProfile) {
+            return res.status(404).json({ message: "Profile Not Found" });
+        }
+
+        res.status(200).json({
+            profile: updatedProfile,
+            message: "Profile Image Updated Successfully",
+        });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

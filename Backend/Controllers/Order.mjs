@@ -39,26 +39,33 @@ export const getOrders = async (req, res) => {
 
 export const createOrder = async (req, res) => {
     try {
-        const { userId, items, totalAmount } = req.body;
-        if (!userId || !items || !totalAmount) {
+        const { userId, name, phone, items, totalAmount, address } = req.body;
+        if (!userId || !name || !phone || !items || !totalAmount || !address) {
             return res.status(400).json({ message: "All Fields Are Required" });
         }
 
-        // Reduce Stock for each item
+        const enrichedItems = [];
         for (const item of items) {
             const product = await Product.findById(item.productId);
             if (!product) {
                 return res
                     .status(404)
-                    .json({ message: `Product ${item.productId} not found` });
+                    .json({ message: `Product ${item.productId} Not Found` });
             }
             if (product.stock < item.quantity) {
                 return res.status(400).json({
-                    message: `Insufficient stock for ${product.name}`,
+                    message: `Insufficient Stock For ${product.name}`,
                 });
             }
             product.stock -= item.quantity;
             await product.save();
+
+            enrichedItems.push({
+                productId: item.productId,
+                name: product.name,
+                price: product.price,
+                quantity: item.quantity,
+            });
         }
 
         // Generate Unique Order Number
@@ -66,8 +73,11 @@ export const createOrder = async (req, res) => {
 
         const order = new Order({
             userId,
+            name,
+            phone,
+            address,
             orderNumber,
-            products: items,
+            products: enrichedItems,
             total: totalAmount,
         });
 
@@ -112,8 +122,6 @@ export const updateOrder = async (req, res) => {
         }
 
         order.status = status;
-
-        // Update timestamps based on status
         if (status === "Dispatched") order.dispatchedAt = new Date();
         if (status === "Delivered") order.deliveredAt = new Date();
         if (status === "Cancelled") order.cancelledAt = new Date();
