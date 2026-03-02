@@ -121,12 +121,20 @@ const Orders = () => {
                                     {order.products?.map((item, idx) => (
                                         <div
                                             key={idx}
-                                            className="flex justify-between text-sm text-slate-600"
+                                            className="flex flex-col justify-between gap-2 text-sm text-slate-600"
                                         >
                                             <span className="font-medium">
-                                                {item.name} x {item.quantity}
+                                                {item.quantity !== 1 ? (
+                                                    <span>
+                                                        {item.name} - ${item.price} x{" "}
+                                                        {item.quantity}
+                                                    </span>
+                                                ) : (
+                                                    <span>
+                                                        {item.name} - ${item.price}
+                                                    </span>
+                                                )}
                                             </span>
-                                            <span>${(item.price * item.quantity).toFixed(2)}</span>
                                         </div>
                                     ))}
                                 </div>

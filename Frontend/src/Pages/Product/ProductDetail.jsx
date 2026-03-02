@@ -36,10 +36,7 @@ const ProductDetail = () => {
     const handleAddToCart = async (redirect = false) => {
         try {
             if (!user) {
-                showMessage(
-                    "Please Login. Logged Users Are Allowed To Access Cart",
-                    "error",
-                );
+                showMessage("Please Login. Logged Users Are Allowed To Access Cart", "error");
                 setTimeout(() => navigate("/login"), 2000);
                 return;
             }
@@ -51,24 +48,17 @@ const ProductDetail = () => {
             if (redirect) {
                 navigate("/cart");
             } else {
-                showMessage(
-                    response.data.message || "Added To Cart!",
-                    "success",
-                );
+                showMessage(response.data.message || "Added To Cart!", "success");
             }
         } catch (err) {
-            showMessage(
-                err.response?.data?.message || "Error Adding To Cart",
-                "error",
-            );
+            showMessage(err.response?.data?.message || "Error Adding To Cart", "error");
         } finally {
             setTimeout(() => setMessage({ text: "", type: "" }), 3000);
         }
     };
 
     if (loading) return <div className="py-20 text-center">Loading...</div>;
-    if (!product)
-        return <div className="py-20 text-center">Product Not Found</div>;
+    if (!product) return <div className="py-20 text-center">Product Not Found</div>;
 
     const discountedPrice = product.offer
         ? product.price - (product.price * product.offerPercentage) / 100
@@ -84,9 +74,7 @@ const ProductDetail = () => {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -20 }}
                         className={`fixed top-20 left-1/2 z-50 -translate-x-1/2 rounded-xl px-6 py-3 text-sm font-bold text-white shadow-lg ${
-                            message.type === "error"
-                                ? "bg-rose-500"
-                                : "bg-emerald-500"
+                            message.type === "error" ? "bg-rose-500" : "bg-emerald-500"
                         }`}
                     >
                         {message.text}
@@ -139,9 +127,7 @@ const ProductDetail = () => {
                         )}
                     </div>
 
-                    <p className="text-lg leading-relaxed text-slate-500">
-                        {product.description}
-                    </p>
+                    <p className="text-lg leading-relaxed text-slate-500">{product.description}</p>
 
                     <div className="flex items-center space-x-6 border-y border-slate-100 py-6">
                         <div className="flex flex-col">
@@ -151,9 +137,7 @@ const ProductDetail = () => {
                             <span
                                 className={`font-bold ${product.stock > 0 ? "text-emerald-500" : "text-rose-500"}`}
                             >
-                                {product.stock > 0
-                                    ? `In Stock (${product.stock})`
-                                    : "Out of Stock"}
+                                {product.stock > 0 ? `In Stock (${product.stock})` : "Out of Stock"}
                             </span>
                         </div>
                         <div className="h-8 w-px bg-slate-100" />
