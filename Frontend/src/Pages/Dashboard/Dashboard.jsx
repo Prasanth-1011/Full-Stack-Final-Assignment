@@ -87,7 +87,7 @@ const Dashboard = () => {
                                 </p>
                             </Link>
                             <Link
-                                to="/update-profile"
+                                to="/profile"
                                 className="group cursor-pointer rounded-2xl bg-slate-50 p-6 transition-colors hover:bg-sky-50"
                             >
                                 <h3 className="mb-2 font-bold text-slate-800 capitalize group-hover:text-sky-600">
